@@ -1,0 +1,32 @@
+service: htran-hello-world
+
+provider:
+  name: aws
+  runtime: python3.7
+
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          cors: true
+
+  authentication:
+    handler: handler.authentication
+    events:
+      - http:
+          path: authentication
+          method: post
+          cors: true
+
+  authorization:
+    handler: handler.authorization
+    events:
+      - http:
+          path: authorization
+          method: get
+          cors: true
+
