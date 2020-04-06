@@ -2,14 +2,14 @@ import json
 
 
 def hello(event, context):
-    body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "input": event
-    }
-
     response = {
         "statusCode": 200,
-        "body": json.dumps(body)
+        'headers': {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True
+
+        },
+        "body": "Hello, World!"
     }
 
     return response
@@ -45,8 +45,8 @@ def authorization(event, context):
     print(f'Event[{type(event)}] ' + str(event))
     print('########################################')
     print(f'Header Type[{type(event["headers"])}] ' + str(event["headers"]))
-    token = event['headers']\
-        .get('Authorization', 'Bearer ')\
+    token = event['headers'] \
+        .get('Authorization', 'Bearer ') \
         .replace('Bearer ', '')
 
     if 'token' not in token:
@@ -54,7 +54,6 @@ def authorization(event, context):
             'statusCode': 403,
             'body': 'You are forbidden'
         }
-
 
     return {
         'statusCode': 200,
