@@ -1,48 +1,44 @@
 import json
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
-def hello(event, context):
+def hello(_, __):
     response = {
-        "statusCode": 200,
+        'statusCode': 200,
         'headers': {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials": True
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True
 
         },
-        "body": "Hello, World!"
+        'body': 'Hello, World!'
     }
-
     return response
 
-    # Use this code if you don't use the http event with the LAMBDA-PROXY
-    # integration
-    """
-    return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
-    }
-    """
 
-
-def authentication(event, context):
+def authentication(event, _):
+    logger.info(f"#### Event[{type(event['body'])} ####")
+    logger.info(event)
     request_payload = json.loads(event['body'])
     username = request_payload['username']
     password = request_payload['password']
 
-    if 'user' not in request_payload['username']:
-        return {
-            'statusCode': 404,
-            'body': 'User not found'
-        }
     body = {'token': f'token.{username}.{password}'}
     return {
         'statusCode': 200,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True
+
+        },
         'body': json.dumps(body)
     }
 
 
-def authorization(event, context):
+def authorization(event, _):
     print(f'Event[{type(event)}] ' + str(event))
+
     print('########################################')
     print(f'Header Type[{type(event["headers"])}] ' + str(event["headers"]))
     token = event['headers'] \
