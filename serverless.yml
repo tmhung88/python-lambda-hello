@@ -67,7 +67,7 @@ resources:
           - ALLOW_REFRESH_TOKEN_AUTH
         GenerateSecret: false
 
-    ApiGatewayAuthorizer: # using this as authorizer for all endpoints
+    ApiGatewayAuthorizer:
       DependsOn:
         - ApiGatewayRestApi
       Type: AWS::ApiGateway::Authorizer
@@ -77,5 +77,15 @@ resources:
         Type: COGNITO_USER_POOLS
         ProviderARNs:
           - Fn::GetAtt: [CognitoUserPool, Arn]
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: ApiGatewayRestApi
