@@ -4,9 +4,10 @@ provider:
   name: aws
   runtime: python3.7
   environment:
-    USER_POOL_ID: !ImportValue htran-dev-UserPoolId
-    USER_POOL_CLIENT_ID: !ImportValue htran-dev-UserPoolClientId
-
+    USER_POOL_ID:
+      Ref: CognitoUserPool
+    USER_POOL_CLIENT_ID:
+      Ref: CognitoUserPoolClient
 
 functions:
   hello:
@@ -72,23 +73,9 @@ resources:
       Type: AWS::ApiGateway::Authorizer
       Properties:
         Name: aga-htran-central-service-reg
-        AuthorizerResultTtlInSeconds: 60
         IdentitySource: method.request.header.Authorization
         Type: COGNITO_USER_POOLS
         ProviderARNs:
           - Fn::GetAtt: [CognitoUserPool, Arn]
         RestApiId:
           Ref: ApiGatewayRestApi
-
-  Outputs:
-    UserPoolId:
-      Value:
-        Ref: CognitoUserPool
-      Export:
-        Name: htran-dev-UserPoolId
-
-    UserPoolClientId:
-      Value:
-        Ref: CognitoUserPoolClient
-      Export:
-        Name: htran-dev-UserPoolClientId
