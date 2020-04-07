@@ -42,7 +42,7 @@ def authentication(event, _):
     logger.info(auth_response)
     auth_result = auth_response['AuthenticationResult']
     body = {
-        'access_token': auth_result['AccessToken'],
+        'token': auth_result['IdToken'],
         'expired_in': auth_result['ExpiresIn'],
         'token_type': auth_result['TokenType']
     }

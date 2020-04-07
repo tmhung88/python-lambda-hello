@@ -16,6 +16,10 @@ functions:
           path: hello
           method: get
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
 
   authentication:
     handler: handler.authentication
@@ -61,6 +65,20 @@ resources:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
         GenerateSecret: false
+
+    ApiGatewayAuthorizer: # using this as authorizer for all endpoints
+      DependsOn:
+        - ApiGatewayRestApi
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: aga-htran-central-service-reg
+        AuthorizerResultTtlInSeconds: 60
+        IdentitySource: method.request.header.Authorization
+        Type: COGNITO_USER_POOLS
+        ProviderARNs:
+          - Fn::GetAtt: [CognitoUserPool, Arn]
+        RestApiId:
+          Ref: ApiGatewayRestApi
 
   Outputs:
     UserPoolId:
