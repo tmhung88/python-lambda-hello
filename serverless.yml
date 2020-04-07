@@ -3,6 +3,9 @@ service: htran-hello-world
 provider:
   name: aws
   runtime: python3.7
+  environment:
+    USER_POOL_ID: !ImportValue htran-dev-UserPoolId
+    USER_POOL_CLIENT_ID: !ImportValue htran-dev-UserPoolClientId
 
 
 functions:
@@ -33,7 +36,7 @@ functions:
 
 resources:
   Resources:
-    userPool:
+    CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
         MfaConfiguration: OFF
@@ -47,3 +50,27 @@ resources:
             RequireNumbers: False
             RequireSymbols: False
             RequireUppercase: False
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ulc-htran-central-service-reg
+        UserPoolId:
+          Ref: CognitoUserPool
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        GenerateSecret: false
+
+  Outputs:
+    UserPoolId:
+      Value:
+        Ref: CognitoUserPool
+      Export:
+        Name: htran-dev-UserPoolId
+
+    UserPoolClientId:
+      Value:
+        Ref: CognitoUserPoolClient
+      Export:
+        Name: htran-dev-UserPoolClientId

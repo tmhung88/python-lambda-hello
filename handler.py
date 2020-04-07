@@ -1,8 +1,12 @@
 import json
 import logging
+import boto3
+import os
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+pool_id = os.environ.get('USER_POOL_ID')
+client_id = os.environ.get('USER_POOL_CLIENT_ID')
 
 def hello(_, __):
     response = {
@@ -24,7 +28,24 @@ def authentication(event, _):
     username = request_payload['username']
     password = request_payload['password']
 
-    body = {'token': f'token.{username}.{password}'}
+
+    client = boto3.client('cognito-idp')
+    auth_response = client.initiate_auth(
+        ClientId=client_id,
+        AuthFlow='USER_PASSWORD_AUTH',
+        AuthParameters={
+            'USERNAME': username,
+            'PASSWORD': password
+        }
+    )
+    logger.info(f'#### Authentication[{type(auth_response)}] #####')
+    logger.info(auth_response)
+    auth_result = auth_response['AuthenticationResult']
+    body = {
+        'access_token': auth_result['AccessToken'],
+        'expired_in': auth_result['ExpiresIn'],
+        'token_type': auth_result['TokenType']
+    }
     return {
         'statusCode': 200,
         'headers': {
